@@ -1,4 +1,4 @@
-const { getCategoryUrl } = require("../get-category-url.js");
+const { getCategoryUrl } = require("../modules/get-category-url.js");
 
 const categories = [
     {
