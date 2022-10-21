@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const treeify = require("treeify");
+const { getCategoryUrl } = require("./get-category-url.js");
 
 async function parseNodesFromPage(page, arrayOfNodes, parentId, productMode = false) {
     let handlesOfNodes = await page.$$("li.product-category");
@@ -13,7 +14,7 @@ async function parseNodesFromPage(page, arrayOfNodes, parentId, productMode = fa
     }
 
     console.log("Found", handlesOfNodes.length, productMode ? "products" : "categories");
-    console.log("      ");
+    console.log("");
 
     for (const itemRoot of handlesOfNodes) {
         const itemH2 = await itemRoot.$("a:nth-child(1) > h2");
@@ -55,10 +56,9 @@ async function main() {
         arrayOfCategories = [];
 
     await parseNodesFromPage(page, arrayOfCategories, undefined);
-    const lengthOfMainCategories = arrayOfCategories.length;
 
-    for (let i = 0; i < lengthOfMainCategories; i++) {
-        await page.goto(`https://threekingsclub.com/product-category/${arrayOfCategories[i].id}/`);
+    for (let i = 0; i < arrayOfCategories.length; i++) {
+        await page.goto(getCategoryUrl(arrayOfCategories[i], arrayOfCategories));
         await parseNodesFromPage(page, arrayOfCategories, arrayOfCategories[i].id);
     }
 
@@ -68,7 +68,7 @@ async function main() {
 
         console.log(partUrl);
 
-        await page.goto(`https://threekingsclub.com/product-category/${partUrl}/`);
+        await page.goto(getCategoryUrl(arrayOfCategories[i], arrayOfCategories));
         await parseNodesFromPage(page, arrayOfProducts, arrayOfCategories[i].id, true);
     }
 
